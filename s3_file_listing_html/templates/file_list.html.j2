@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        File Listing
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett">
+    <link rel="preload" href="/static/fonts/noto-sans-display-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/fira-code-v12-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/fira-code-v12-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/fira-code-v12-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/noto-sans-display-latin-500italic.woff2" as="font" type="font/woff2"
+        crossorigin>
+    <script type="module" src="/static/file_list.js"></script>
+    <link rel="stylesheet" href="/static/file_list.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        .file-list {
+            display: none;
+        }
+    </style>
+    <noscript>
+        <style>
+            #breadcrumb_js {
+                display: none !important;
+            }
+
+            #file_list {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+</head>
+
+<body>
+    <main>
+        <h1>File Listing</h1>
+        <noscript>
+            <div id="breadcrumb_non_js" class="breadcrumb"><a>Javascript is disabled, listing
+                    everything.</a></div>
+        </noscript>
+        <div id="breadcrumb_js" class="breadcrumb"></div>
+        <ul id="file_list_js" class="file-list"></ul>
+        <ul id="file_list" class="file-list">{% for file in file_list %}
+            <li><a href="{{ base_url }}/{{ file }}">/{{ file }}</a></li>{% endfor %}
+        </ul>
+        <p class="last-generated">Last generated: {{ last_generated_date }}</p>
+    </main>
+</body>
+
+</html>

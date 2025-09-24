@@ -1,0 +1,72 @@
+[project]
+name = "s3-file-listing-html"
+version = "0.1.0"
+description = "Generates a static HTML file listing the contents of an S3 bucket."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = ["boto3>=1.40.37", "jinja2>=3.1.6", "python-dotenv>=1.1.1"]
+
+[dependency-groups]
+lint = ["ruff>=0.13.1"]
+type = [
+    "mypy>=1.18.2",
+    "boto3-stubs[s3]",
+    "ty>=0.0.1a21",
+]
+
+[tool.uv]
+default-groups = ["type", "lint"]
+
+[tool.ruff]
+cache-dir = "~/.cache/ruff"
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"] # KG Include absolutely all of Ruff's rules.
+ignore = [
+    # Modules
+    "DJ", # KG Django not required
+
+    # Specific rules
+    "TD002",  # KG Verbose TODO, only I work on this project
+    "TD003",  # KG Verbose TODO, only I work on this project
+    "ISC001", # KG conflict in the formatter
+    "COM812", # KG conflict in the formatter
+]
+
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 40
+
+
+[tool.coverage.html]
+show_contexts = true
+
+
+[tool.mypy]
+files = ["s3_file_listing_html"]
+namespace_packages = false # God knows why this makes mypy take forever
+explicit_package_bases = false # God knows why this makes mypy take forever
+show_error_codes = true
+strict = true
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+    "type-arg",
+    "unused-awaitable",
+    "possibly-undefined",
+    "redundant-self",
+]
+warn_unreachable = true
+warn_redundant_casts = true
