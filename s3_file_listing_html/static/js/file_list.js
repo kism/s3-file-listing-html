@@ -1,4 +1,4 @@
-//Trying to make this work for IE6+
+// Trying to make this work for anything ES6 compliant
 // Author: Kieran Gee
 // License: MIT
 // Works on:

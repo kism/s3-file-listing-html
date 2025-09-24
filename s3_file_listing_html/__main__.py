@@ -134,9 +134,12 @@ def main() -> None:
     with contextlib.suppress(KeyError):
         log_level = os.environ["LOG_LEVEL"].upper()
         logger.setLevel(log_level)
-        logger.info("Log level set to %s from environment variable LOG_LEVEL", log_level)
+        logger.debug("Log level set to %s from environment variable LOG_LEVEL", log_level)
 
-    logger.info("Hello from s3-file-listing-html!")
+    logger.info("Hello, making your file list!")
+    logger.info("S3 Bucket: %s", settings.s3_bucket_name)
+    logger.info("Base URL: %s", settings.base_url)
+    logger.info("Output Path: %s", settings.output_path.resolve())
     file_list = _get_file_list()
     _render_html(file_list)
     _copy_static_files()
