@@ -31,9 +31,14 @@ EXPECTED_ENV_VARS = [
     "AWS_ENDPOINT_URL",
     "AWS_ACCESS_KEY_ID",
     "AWS_SECRET_ACCESS_KEY",
-    "LOG_LEVEL",
     "BASE_URL",
 ]
+
+OPTIONAL_ENV_VARS = [
+    "OUTPUT_PATH",
+    "LOG_LEVEL",
+]
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
@@ -107,12 +112,20 @@ def _check_env_vars() -> None:
 
     for var in EXPECTED_ENV_VARS:
         if var not in os.environ:
-            errors.append(f"Environment variable {var} is not set.")
+            errors.append(f"{var} is not set")
         if os.getenv(var) == "":
-            errors.append(f"Environment variable {var} is empty.")
+            errors.append(f"{var} is empty")
 
     if errors:
         msg = ", ".join(errors)
+        logger.error("Environment variable check failed: %s", msg)
+
+        dotenv_example = ""
+        for var in EXPECTED_ENV_VARS + OPTIONAL_ENV_VARS:
+            dotenv_example += f"{var}=""\n"
+
+        logger.info("All environment variables:\n%s", dotenv_example)
+
         raise OSError(msg)
 
 
@@ -131,6 +144,7 @@ def main() -> None:
 
 dotenv.load_dotenv()
 _check_env_vars()
+logger.setLevel(os.getenv("LOG_LEVEL", "INFO").upper())
 
 if os.getenv("OUTPUT_PATH") is None:
     logger.warning("Environment variable OUTPUT_PATH is not set, using default value ./output")
