@@ -125,14 +125,14 @@ function checkValidPath(path) {
 // Get the current path from the URL hash
 function getNicePathStr() {
   var path = window.location.hash;
-
   path = path.replace("#", ""); // Remove the hash
+  path = decodeURIComponent(path); // Decode URL-encoded characters (e.g., spaces)
 
   if (path === "" || path === "/") {
     // If the path is empty or just a slash, return a single slash
     return "/";
   }
-  path = path.replace(/\/\//g, "/"); // Replace double slashes with a single slash
+  path = path.replace(/\/+/g, "/"); // Replace double slashes with a single slash
   if (path[path.length - 1] === "/") {
     // Remove trailing slash
     path = path.slice(0, -1);
