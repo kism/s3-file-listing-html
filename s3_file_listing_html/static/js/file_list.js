@@ -1,3 +1,15 @@
+//Trying to make this work for IE6+
+// Author: Kieran Gee
+// License: MIT
+// Works on:
+//   - IE 8
+//   - Firefox 142
+//   - Safari 26
+//   - Firefox 4
+// Does not work on:
+//   - IE 6
+//   - IE 7
+//   - Firefox 3
 
 // Root object for file system structure
 var file_structure = {};
