@@ -1,13 +1,8 @@
-/**
- * File list module for managing directory structure and navigation
- */
 
 // Root object for file system structure
 var file_structure = {};
 
-/**
- * Shows file navigation UI elements
- */
+// Show the JS generated divs and hide the original file list
 function showJSDivs() {
   var breadcrumbJSDiv = document.getElementById("breadcrumb_js");
   if (breadcrumbJSDiv) {
@@ -19,11 +14,7 @@ function showJSDivs() {
   }
 }
 
-/**
- * Adds a file to the virtual file system structure
- * @param {string} url - File URL
- * @param {string} file_path - File path in structure
- */
+// Add a file to the file structure object
 function addFileToStructure(url, file_path) {
   var path_parts = file_path.split("/");
   var current = file_structure;
@@ -37,11 +28,7 @@ function addFileToStructure(url, file_path) {
   current.url = url;
 }
 
-/**
- * Generates breadcrumb navigation HTML
- * @param {string} in_current_path - Current directory path
- * @returns {string} HTML string
- */
+// Generate breadcrumb HTML
 function generateBreadcrumbHtml(in_current_path) {
   var html = "";
   var path = [""];
@@ -62,6 +49,7 @@ function generateBreadcrumbHtml(in_current_path) {
   return html;
 }
 
+// Generate current directory listing HTML
 function generateCurrentListHTML(in_current_path, items) {
   var html = "";
   var current_path_nice = in_current_path;
@@ -101,6 +89,7 @@ function generateCurrentListHTML(in_current_path, items) {
   return html;
 }
 
+// Retrieve value from nested object based on path
 function getValue(obj, path) {
   var keys, current, i;
   if (path === "/") return obj[""];
@@ -133,6 +122,7 @@ function checkValidPath(path) {
   return true;
 }
 
+// Get the current path from the URL hash
 function getNicePathStr() {
   var path = window.location.hash;
 
@@ -150,6 +140,7 @@ function getNicePathStr() {
   return path;
 }
 
+// Show the current directory based on the URL hash
 function showCurrentDirectory() {
   var current_path = getNicePathStr();
   var breadcrumbJSDiv, fileListJSDiv, items;
