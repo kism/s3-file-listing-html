@@ -146,11 +146,13 @@ dotenv.load_dotenv()
 _check_env_vars()
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO").upper())
 
-if os.getenv("OUTPUT_PATH") is None:
+path_str = os.getenv("OUTPUT_PATH") or ""
+
+if path_str == "":
     logger.warning("Environment variable OUTPUT_PATH is not set, using default value ./output")
     output_path = Path.cwd() / "output"
 else:
-    output_path = Path(os.getenv("OUTPUT_PATH"))
+    output_path = Path(path_str)
 
 settings = Settings(
     s3_bucket_name=os.getenv("S3_BUCKET_NAME") or "",
