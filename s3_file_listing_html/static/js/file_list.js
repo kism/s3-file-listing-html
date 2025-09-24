@@ -3,17 +3,17 @@
  */
 
 // Root object for file system structure
-export const file_structure = new Object();
+var file_structure = {};
 
 /**
  * Shows file navigation UI elements
  */
-export function showJSDivs() {
-  const breadcrumbJSDiv = document.getElementById("breadcrumb_js");
+function showJSDivs() {
+  var breadcrumbJSDiv = document.getElementById("breadcrumb_js");
   if (breadcrumbJSDiv) {
     breadcrumbJSDiv.style.display = "block";
   }
-  const fileListJSDiv = document.getElementById("file_list_js");
+  var fileListJSDiv = document.getElementById("file_list_js");
   if (fileListJSDiv) {
     fileListJSDiv.style.display = "block";
   }
@@ -24,12 +24,13 @@ export function showJSDivs() {
  * @param {string} url - File URL
  * @param {string} file_path - File path in structure
  */
-export function addFileToStructure(url, file_path) {
-  const path_parts = file_path.split("/");
-  let current = file_structure;
-  for (let i = 0; i < path_parts.length; i++) {
+function addFileToStructure(url, file_path) {
+  var path_parts = file_path.split("/");
+  var current = file_structure;
+  var i;
+  for (i = 0; i < path_parts.length; i++) {
     if (!current[path_parts[i]]) {
-      current[path_parts[i]] = new Object();
+      current[path_parts[i]] = {};
     }
     current = current[path_parts[i]];
   }
@@ -41,49 +42,57 @@ export function addFileToStructure(url, file_path) {
  * @param {string} in_current_path - Current directory path
  * @returns {string} HTML string
  */
-export function generateBreadcrumbHtml(in_current_path) {
-  let html = "";
-  let path = [""];
+function generateBreadcrumbHtml(in_current_path) {
+  var html = "";
+  var path = [""];
+  var i, current;
 
   if (in_current_path !== "/") {
     path = in_current_path.split("/");
   }
   path.shift();
 
-  let current = "";
-  html += `<a href="#/">File list</a> / `;
-  for (let i = 0; i < path.length; i++) {
-    current = `${current}/${path[i]}`;
+  current = "";
+  html += '<a href="#/">File list</a> / ';
+  for (i = 0; i < path.length; i++) {
+    current = current + "/" + path[i];
     current = current.replace(/\/\//g, "/");
-    html += `<a href="#${current}/">${path[i]}</a> / `;
+    html += '<a href="#' + current + '/">' + path[i] + "</a> / ";
   }
   return html;
 }
 
-export function generateCurrentListHTML(in_current_path, items) {
-  let html = "";
-
-  let current_path_nice = in_current_path;
+function generateCurrentListHTML(in_current_path, items) {
+  var html = "";
+  var current_path_nice = in_current_path;
+  var current_path_split;
+  var key, value;
 
   if (in_current_path !== "/") {
-    let current_path_split = current_path_nice.split("/");
+    current_path_split = current_path_nice.split("/");
     current_path_split.pop();
     current_path_split = current_path_split.join("/");
-    html += `<li>📂 <a href="#${current_path_split}/">..</a></li>`;
+    html += '<li>📂 <a href="#' + current_path_split + '/">..</a></li>';
   } else {
     current_path_nice = "";
   }
 
   if (items && typeof items === "object") {
-    for (const [key, value] of Object.entries(items)) {
-      if (value.url === undefined) {
-        html += `<li>📂 <a href="#${current_path_nice}/${key}/" ;>${key}/</a></li>`;
+    for (key in items) {
+      if (items.hasOwnProperty(key)) {
+        value = items[key];
+        if (value.url === undefined) {
+          html += '<li>📂 <a href="#' + current_path_nice + "/" + key + '/" ;>' + key + "/</a></li>";
+        }
       }
     }
 
-    for (const [key, value] of Object.entries(items)) {
-      if (value.url !== undefined) {
-        html += `<li>💾 <a href="${value.url}">${key}</a></li>`;
+    for (key in items) {
+      if (items.hasOwnProperty(key)) {
+        value = items[key];
+        if (value.url !== undefined) {
+          html += '<li>💾 <a href="' + value.url + '">' + key + "</a></li>";
+        }
       }
     }
   }
@@ -92,21 +101,31 @@ export function generateCurrentListHTML(in_current_path, items) {
   return html;
 }
 
-export function getValue(obj, path) {
+function getValue(obj, path) {
+  var keys, current, i;
   if (path === "/") return obj[""];
-  const keys = path.split("/"); // Split the path by '/' into an array of keys.
-  return keys.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
+  keys = path.split("/"); // Split the path by '/' into an array of keys.
+  current = obj;
+  for (i = 0; i < keys.length; i++) {
+    if (current && current[keys[i]] !== undefined) {
+      current = current[keys[i]];
+    } else {
+      return undefined;
+    }
+  }
+  return current;
 }
 
-export function checkValidPath(path) {
+function checkValidPath(path) {
+  var path_parts, current, i;
   if (path === "" || path === "/") {
     return true;
   }
-  const path_parts = path.split("/");
-  let current = file_structure;
-  for (let i = 0; i < path_parts.length; i++) {
+  path_parts = path.split("/");
+  current = file_structure;
+  for (i = 0; i < path_parts.length; i++) {
     if (!current[path_parts[i]]) {
-      console.log("Invalid path: ", path);
+      // console.log("Invalid path: ", path);
       return false;
     }
     current = current[path_parts[i]];
@@ -114,8 +133,8 @@ export function checkValidPath(path) {
   return true;
 }
 
-export function getNicePathStr() {
-  let path = window.location.hash;
+function getNicePathStr() {
+  var path = window.location.hash;
 
   path = path.replace("#", ""); // Remove the hash
 
@@ -131,15 +150,16 @@ export function getNicePathStr() {
   return path;
 }
 
-export function showCurrentDirectory() {
-  let current_path = getNicePathStr();
+function showCurrentDirectory() {
+  var current_path = getNicePathStr();
+  var breadcrumbJSDiv, fileListJSDiv, items;
 
   // Handle invalid paths
   if (!checkValidPath(current_path)) {
-    const breadcrumbJSDiv = document.getElementById("breadcrumb_js");
+    breadcrumbJSDiv = document.getElementById("breadcrumb_js");
     breadcrumbJSDiv.innerHTML = generateBreadcrumbHtml("/");
-    const fileListJSDiv = document.getElementById("file_list_js");
-    fileListJSDiv.innerHTML = `<li>Invalid path: ${current_path}</li>`;
+    fileListJSDiv = document.getElementById("file_list_js");
+    fileListJSDiv.innerHTML = "<li>Invalid path: " + current_path + "</li>";
     return;
   }
 
@@ -153,35 +173,50 @@ export function showCurrentDirectory() {
   }
 
   // Update breadcrumb
-  const breadcrumbJSDiv = document.getElementById("breadcrumb_js");
+  breadcrumbJSDiv = document.getElementById("breadcrumb_js");
   if (breadcrumbJSDiv) {
     breadcrumbJSDiv.innerHTML = generateBreadcrumbHtml(current_path);
   }
 
   //File List
-  const items = getValue(file_structure, current_path);
-  const fileListJSDiv = document.getElementById("file_list_js");
+  items = getValue(file_structure, current_path);
+  fileListJSDiv = document.getElementById("file_list_js");
   if (fileListJSDiv) {
     fileListJSDiv.innerHTML = generateCurrentListHTML(current_path, items);
   }
 }
 
 // Initialize file list
-document.addEventListener("DOMContentLoaded", () => {
-  const fileListDiv = document.getElementById("file_list");
+function initFileList() {
+  var fileListDiv = document.getElementById("file_list");
+  var links, link, i;
   if (fileListDiv) {
     fileListDiv.style.display = "none";
-    const links = fileListDiv.querySelectorAll("a");
-    for (const link of links) {
-      if (link?.firstChild) {
-        addFileToStructure(link.href, link.firstChild.textContent);
+    links = fileListDiv.getElementsByTagName("a");
+    for (i = 0; i < links.length; i++) {
+      link = links[i];
+      if (link && link.firstChild) {
+        addFileToStructure(
+          link.href,
+          link.firstChild.nodeValue || link.firstChild.textContent || link.firstChild.innerText
+        );
       }
     }
   }
   showJSDivs();
   showCurrentDirectory();
-});
+}
 
 // Handle navigation
-window.addEventListener("hashchange", showCurrentDirectory);
+initFileList();
+
+if (window.addEventListener) {
+  window.addEventListener("hashchange", showCurrentDirectory, false);
+} else if (window.attachEvent) {
+  // Hopefully gives us IE6 support
+  window.attachEvent("onhashchange", showCurrentDirectory);
+} else {
+  window["onhashchange"] = showCurrentDirectory;
+}
+
 showCurrentDirectory();

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "devDependencies": {
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0"
+  }
+}
