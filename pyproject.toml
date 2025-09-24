@@ -25,7 +25,7 @@ build-backend = "uv_build"
 module-root = ""
 
 [project.scripts]
-spoofy-archiver = "s3_file_listing_html:__main__.main"
+s3-file-listing-html= "s3_file_listing_html:__main__.main"
 
 [tool.ruff]
 cache-dir = "~/.cache/ruff"
