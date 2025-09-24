@@ -1,10 +1,10 @@
 """Console script for s3_file_listing_html."""
 
 import contextlib
-from dataclasses import dataclass
 import logging
 import os
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
