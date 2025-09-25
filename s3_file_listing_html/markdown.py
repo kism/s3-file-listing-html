@@ -5,7 +5,7 @@ from pathlib import Path
 import bs4
 
 import markdown
-
+from markdown.extensions.tables import TableExtension
 from .constants import TEMPLATE_ENV
 
 FIND_MARKDOWN_TITLE = [
@@ -14,6 +14,7 @@ FIND_MARKDOWN_TITLE = [
 ]
 
 TITLE_CLEANUP = re.compile(r"[^a-zA-Z0-9 _-]+")
+
 
 def render_markdown_files(markdown_path: Path, output_path: Path) -> None:
     """Render markdown files from the markdown_path to HTML files in the output_path."""
@@ -33,7 +34,7 @@ def render_markdown_files(markdown_path: Path, output_path: Path) -> None:
 
         title = TITLE_CLEANUP.sub("", title).strip()
 
-        html = markdown.markdown(text)
+        html = markdown.markdown(text, extensions=[TableExtension()])
 
         template = TEMPLATE_ENV.get_template("md.html.j2")
         rendered = template.render(content=html, title=title)
