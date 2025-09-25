@@ -1,5 +1,8 @@
+"""Constants for the S3 file listing HTML generator."""
 
 from pathlib import Path
+
+import jinja2
 
 STATIC_PATH = Path(__file__).parent / "static"
 TEMPLATES_PATH = Path(__file__).parent / "templates"
@@ -15,5 +18,8 @@ EXPECTED_ENV_VARS = [
 
 OPTIONAL_ENV_VARS = [
     "OUTPUT_PATH",
+    "MARKDOWN_PATH",
     "LOG_LEVEL",
 ]
+
+TEMPLATE_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=TEMPLATES_PATH), autoescape=False)
