@@ -132,7 +132,7 @@ function checkValidPath(path) {
   current = file_structure;
   for (i = 0; i < path_parts.length; i++) {
     if (!current[path_parts[i]]) {
-      // console.log("Invalid path: ", path);
+      console.log("Invalid path: ", path);
       return false;
     }
     current = current[path_parts[i]];
