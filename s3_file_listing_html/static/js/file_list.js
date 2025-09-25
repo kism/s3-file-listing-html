@@ -17,7 +17,7 @@ var file_structure = {};
 // IE6 Help
 if (! console) {
   console = {};
-  console.log = function (msg) {popup(msg);};
+  console.log = function (msg) {alert(msg);};
 }
 
 // Show the JS generated divs and hide the original file list
