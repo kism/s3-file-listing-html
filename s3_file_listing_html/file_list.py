@@ -12,7 +12,9 @@ def render_file_list(file_list: list[str], base_url: str, output_path: Path) -> 
 
     template = TEMPLATE_ENV.get_template("filelist.html.j2")
     rendered = template.render(
-        file_list=file_list, base_url=base_url, last_generated_date=int(datetime.now(tz=UTC).timestamp())
+        file_list=file_list,
+        base_url=base_url,
+        last_generated_date=(datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M:%S %Z")),
     )
 
     output_path = output_path / "filelist.html"

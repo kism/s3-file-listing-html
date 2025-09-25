@@ -20,6 +20,7 @@ type = [
     "boto3-stubs[s3]",
     "types-colorama",
     "ty>=0.0.1a21",
+    "types-Markdown",
 ]
 
 [tool.uv]
@@ -33,7 +34,7 @@ build-backend = "uv_build"
 module-root = ""
 
 [project.scripts]
-s3-file-listing-html= "s3_file_listing_html:__main__.main"
+s3-file-listing-html = "s3_file_listing_html:__main__.main"
 
 [tool.ruff]
 cache-dir = "~/.cache/ruff"
@@ -51,6 +52,7 @@ ignore = [
     "TD003",  # KG Verbose TODO, only I work on this project
     "ISC001", # KG conflict in the formatter
     "COM812", # KG conflict in the formatter
+    "S701",   # KG No autoescape, we are generating a static site
 ]
 
 

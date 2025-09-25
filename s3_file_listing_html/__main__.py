@@ -65,7 +65,7 @@ class TimeKeeper:
         """Initialise the TimeKeeper."""
         self.original_start_time = time.time()
         self.start_time = time.time()
-        self.split_times = []
+        self.split_times: list[tuple[str, float]] = []
 
     def split(self, name: str) -> None:
         """Record a split time with a name."""
@@ -99,25 +99,30 @@ def main() -> None:
     s3_handler = S3Handler(bucket_name=settings.s3_bucket_name)
     time_keeper.split("S3Handler initialisation")
 
-    # Do this twice so it gets itself in the listing
-    force_refresh = False
-    for i in range(2):
-        if i > 0:
-            force_refresh = True
-        file_list = s3_handler.get_file_list(force_refresh=force_refresh)
+    # Markdown
+    render_markdown_files(settings.markdown_path, settings.output_path)
+    time_keeper.split("render_markdown_files")
+
+    # filelist.html
+    need_second_pass = False
+    for i in range(2):  # Do this twice so it gets itself in the listing
+        file_list = s3_handler.get_file_list()
+        if len(file_list) == 0:
+            need_second_pass = True
+
         time_keeper.split(f"S3Handler get_file_list pass {i + 1}")
 
         render_file_list(file_list, settings.base_url, settings.output_path)
         time_keeper.split(f"render_file_list pass {i + 1}")
-
-        render_markdown_files(settings.markdown_path, settings.output_path)
-        time_keeper.split(f"render_markdown_files pass {i + 1}")
 
         copy_static_files(settings.output_path)
         time_keeper.split(f"copy_static_files pass {i + 1}")
 
         s3_handler.upload_directory(settings.output_path)
         time_keeper.split(f"S3Handler upload_directory pass {i + 1}")
+
+        if not need_second_pass:
+            break
 
     logger.info(time_keeper.summary())
 

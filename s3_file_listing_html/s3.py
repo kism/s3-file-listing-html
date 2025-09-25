@@ -26,18 +26,12 @@ class S3Handler:
         self._client = boto3.client("s3")
         self._all_objects: list[ObjectTypeDef] = []
         self._hash_cache: dict[str, str] = {}
-        self._try_refresh_contents()
 
-    def _try_refresh_contents(self, *, force_refresh: bool = False) -> None:
-        if len(self._all_objects) == 0 or force_refresh:
-            logger.debug("Refreshing S3 contents, items=%s, force_refresh=%s", len(self._all_objects), force_refresh)
-            self._refresh_contents()
-            self._cleanup()
-            self._refresh_contents()
-        else:
-            logger.debug(
-                "Skipping S3 contents refresh, items=%s, force_refresh=%s", len(self._all_objects), force_refresh
-            )
+    def _refresh_cleanup_contents(self, *, force_refresh: bool = False) -> None:
+        logger.debug("Refreshing S3 contents, items=%s, force_refresh=%s", len(self._all_objects), force_refresh)
+        self._refresh_contents()
+        self._cleanup()
+        self._refresh_contents()
 
     def _refresh_contents(self) -> None:
         paginator = self._client.get_paginator("list_objects_v2")
@@ -63,50 +57,49 @@ class S3Handler:
                 logger.warning("⛅ S3 Path contains a //, this is not expected: %s DELETING", obj["Key"])
                 self._client.delete_object(Bucket=self.bucket_name, Key=obj["Key"])
 
-    def get_file_list(self, *, force_refresh: bool = False) -> list[str]:
+    def get_file_list(self) -> list[str]:
         """Get a nice list of all files in the bucket."""
-        self._try_refresh_contents(force_refresh=force_refresh)
+        self._refresh_cleanup_contents()
 
         contents_nice_list: list[str] = []
         if len(self._all_objects) > 0:
             contents_nice_list = [obj["Key"] for obj in self._all_objects]
         return contents_nice_list
 
+    def _get_sha256(self, file_path: Path) -> str:
+        """Calculate the SHA256 hash of a file."""
+        if str(file_path) in self._hash_cache and "filelist.html" not in str(file_path):
+            return self._hash_cache[str(file_path)]
+
+        sha256_hash = hashlib.sha256()
+        with file_path.open("rb") as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        hash_str = sha256_hash.hexdigest()
+        self._hash_cache[str(file_path)] = hash_str
+        return hash_str
+
+    def _get_remote_sha256(self, key: str) -> str:
+        """Get the SHA256 hash from the S3 object's metadata."""
+        if key in self._hash_cache:
+            return self._hash_cache[key]
+
+        try:
+            hash_str = self._client.head_object(Bucket=self.bucket_name, Key=key).get("Metadata", {}).get("sha256", "")
+        except ClientError:
+            hash_str = ""
+        self._hash_cache[key] = hash_str
+        return hash_str
+
     def upload_directory(self, base_directory: Path, prefix: str = "") -> None:
         """Upload a directory to S3, skipping files that are unchanged based on SHA256 hash."""
-
-        def _get_sha256(file_path: Path) -> str:
-            """Calculate the SHA256 hash of a file."""
-            if str(file_path) in self._hash_cache and "filelist.html" not in str(file_path):
-                return self._hash_cache[str(file_path)]
-
-            sha256_hash = hashlib.sha256()
-            with file_path.open("rb") as f:
-                for byte_block in iter(lambda: f.read(4096), b""):
-                    sha256_hash.update(byte_block)
-            hash_str = sha256_hash.hexdigest()
-            self._hash_cache[str(file_path)] = hash_str
-            return hash_str
-
-        def _get_remote_sha256(key: str) -> str:
-            """Get the SHA256 hash from the S3 object's metadata."""
-            if key in self._hash_cache:
-                return self._hash_cache[key]
-
-            try:
-                hash_str = self._client.head_object(Bucket=self.bucket_name, Key=key).get("Metadata", {}).get("sha256", "")
-            except ClientError:
-                hash_str = ""
-            self._hash_cache[key] = hash_str
-            return hash_str
-
         skipped_count = 0
         for path in base_directory.rglob("*"):
             if path.is_file():
                 key = prefix + str(path.relative_to(base_directory)).replace("\\", "/")
 
-                local_sha256 = _get_sha256(path)
-                remote_sha256 = _get_remote_sha256(key)
+                local_sha256 = self._get_sha256(path)
+                remote_sha256 = self._get_remote_sha256(key)
 
                 if local_sha256 != remote_sha256:
                     logger.info("Uploading %s to s3://%s/%s", path, self.bucket_name, key)

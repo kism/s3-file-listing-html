@@ -2,10 +2,11 @@
 
 import re
 from pathlib import Path
-import bs4
 
+import bs4
 import markdown
 from markdown.extensions.tables import TableExtension
+
 from .constants import TEMPLATE_ENV
 
 FIND_MARKDOWN_TITLE = [
