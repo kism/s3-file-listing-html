@@ -1,23 +1,20 @@
 // Trying to make this work for anything ES6 compliant
 // Author: Kieran Gee
 // License: MIT
-// Works on:
-//   - IE 8
+// Hash navigation works on:
+//   - IE 8+
 //   - Firefox 142
 //   - Safari 26
-//   - Firefox 4
-// Does not work on:
-//   - IE 6
-//   - IE 7
-//   - Firefox 3
+//   - Firefox 3.6+
 
 // Root object for file system structure
 var file_structure = {};
 
 // IE6 Help
-if (! console) {
-  console = {};
-  console.log = function (msg) {alert(msg);};
+if (typeof console === "undefined" || !console) {
+  var console = {};
+  console.log = function (msg) {};
+  // console.log = function (msg) {alert(msg);};
 }
 
 // Show the JS generated divs and hide the original file list
@@ -216,16 +213,36 @@ function initFileList() {
   showCurrentDirectory();
 }
 
-// Handle navigation
-initFileList();
+function showStaticListing() {
+  var fileListDiv = document.getElementById("file_list");
+  if (fileListDiv) {
+    fileListDiv.style.display = "block";
+  }
+  var breadcrumbJSDiv = document.getElementById("breadcrumb_js");
+  if (breadcrumbJSDiv) {
+    breadcrumbJSDiv.style.display = "none";
+  }
+}
 
-if (window.addEventListener) {
-  console.log("Using addEventListener, modern browser");
-  window.addEventListener("hashchange", showCurrentDirectory, false);
+// Handle navigation
+function supportsHashChange() {
+  return "onhashchange" in window || (typeof document.documentMode === "number" && document.documentMode >= 8);
+}
+
+if (supportsHashChange()) {
+  initFileList();
+  console.log("Browser supports hashchange event");
+
+  if (window.addEventListener) {
+    console.log("Using addEventListener for hashchange");
+    window.addEventListener("hashchange", showCurrentDirectory, false);
+  } else if (window.attachEvent) {
+    console.log("Using attachEvent for hashchange (IE8)");
+    window.attachEvent("onhashchange", showCurrentDirectory);
+  }
   showCurrentDirectory();
-} else if (window.attachEvent) {
-  // Hopefully gives us IE8? support
-  console.log("Using attachEvent, old IE");
-  window.attachEvent("onhashchange", showCurrentDirectory);
-  showCurrentDirectory();
+} else {
+  // Very old browser, no hashchange event support
+  console.log("No hashchange event support, falling back to static listing");
+  showStaticListing();
 }
