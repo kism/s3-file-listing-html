@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from .constants import TEMPLATE_ENV
+import bs4
 
 
 def render_file_list(file_list: list[str], base_url: str, output_path: Path) -> None:
@@ -16,6 +17,8 @@ def render_file_list(file_list: list[str], base_url: str, output_path: Path) -> 
         base_url=base_url,
         last_generated_date=(datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M:%S %Z")),
     )
+
+    rendered = bs4.BeautifulSoup(rendered, "html.parser").prettify()
 
     output_path = output_path / "filelist.html"
     output_path.parent.mkdir(parents=True, exist_ok=True)

@@ -40,8 +40,7 @@ def render_markdown_files(markdown_path: Path, output_path: Path) -> None:
         template = TEMPLATE_ENV.get_template("md.html.j2")
         rendered = template.render(content=html, title=title)
 
-        soup = bs4.BeautifulSoup(rendered, "html.parser")
-        rendered = soup.prettify()
+        rendered = bs4.BeautifulSoup(rendered, "html.parser").prettify()
 
         output_file = output_path / (md_file.stem + ".html")
         with output_file.open("w", encoding="utf-8") as f:
