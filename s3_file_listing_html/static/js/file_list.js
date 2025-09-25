@@ -14,6 +14,12 @@
 // Root object for file system structure
 var file_structure = {};
 
+// IE6 Help
+if (! console) {
+  console = {};
+  console.log = function (msg) {popup(msg);};
+}
+
 // Show the JS generated divs and hide the original file list
 function showJSDivs() {
   var breadcrumbJSDiv = document.getElementById("breadcrumb_js");
