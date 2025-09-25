@@ -13,11 +13,13 @@
     <link rel="stylesheet" href="/static/css/file_list.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
         }
+
         .file-list {
             display: none;
         }
@@ -48,20 +50,24 @@
                     <div id="breadcrumb_js" class="breadcrumb"></div>
                     <ul id="file_list_js" class="file-list"></ul>
                     <ul id="file_list" class="file-list">{% for file in file_list %}
-                        <li><a href="{{ base_url }}/{{ file }}">/{{ file }}</a></li>{% endfor %}
+                        <li><a href="{{ base_url }}/{{ file | urlencode }}">/{{ file }}</a></li>{% endfor %}
                     </ul>
                 </main>
             </td>
         </tr>
         <tr height="1">
             <td valign="bottom">
-                <p>Last generated: {{ last_generated_date }}</p>
+                <small>
+                    Last generated: {{ last_generated_date }}
+                </small>
             </td>
         </tr>
     </table>
     <script type="text/javascript" src="/static/js/file_list.js"></script>
-    {# <script type="text/javascript"
-        src="http://autist.network/files/funny-computer/firebug-lite-debug.js#startOpened=true,debug=false,overrideConsole=true"></script> #}
+    {#
+    <script type="text/javascript"
+        src="http://autist.network/files/funny-computer/firebug-lite-debug.js#startOpened=true,debug=false,overrideConsole=true"></script>
+    #}
 </body>
 
 </html>
