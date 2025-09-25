@@ -56,8 +56,16 @@ body {
   margin-right: 23px;
 }
 
-.contained-content {
-  max-width: 700px;
+/* IE6 ? */
+h1,
+h2,
+h3,
+h4,
+p,
+li,
+td,
+th {
+    color: #c8c8c8;
 }
 
 h1,
