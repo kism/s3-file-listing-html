@@ -214,12 +214,12 @@ function initFileList() {
 initFileList();
 
 if (window.addEventListener) {
+  console.log("Using addEventListener, modern browser");
   window.addEventListener("hashchange", showCurrentDirectory, false);
+  showCurrentDirectory();
 } else if (window.attachEvent) {
-  // Hopefully gives us IE6 support
+  // Hopefully gives us IE8? support
+  console.log("Using attachEvent, old IE");
   window.attachEvent("onhashchange", showCurrentDirectory);
-} else {
-  window["onhashchange"] = showCurrentDirectory;
+  showCurrentDirectory();
 }
-
-showCurrentDirectory();
