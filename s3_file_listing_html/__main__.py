@@ -58,15 +58,34 @@ def _check_env_vars() -> None:
         raise OSError(msg)
 
 
-def time_split(name: str) -> None:
-    global start_time
-    logger.warning("%s took %.2f seconds", name, time.time() - start_time)
-    start_time = time.time()
+class TimeKeeper:
+    """Class to keep track of time taken for different parts of the process."""
+
+    def __init__(self) -> None:
+        """Initialise the TimeKeeper."""
+        self.original_start_time = time.time()
+        self.start_time = time.time()
+        self.split_times = []
+
+    def split(self, name: str) -> None:
+        """Record a split time with a name."""
+        self.split_times.append((name, time.time() - self.start_time))
+        self.start_time = time.time()
+
+    def summary(self) -> str:
+        """Return a summary of the time taken."""
+        msg = "TimeKeeper Summary >>>\n"
+        for name, duration in self.split_times:
+            msg += f"  {name}: {duration:.2f} seconds\n"
+        msg += f"Total time: {time.time() - self.original_start_time:.2f} seconds"
+        return msg
+
+
+time_keeper = TimeKeeper()
 
 
 def main() -> None:
     """Console script for s3_file_listing_html."""
-
     with contextlib.suppress(KeyError):
         log_level = os.environ["LOG_LEVEL"].upper()
         logger.setLevel(log_level)
@@ -78,7 +97,7 @@ def main() -> None:
     logger.info("Output Path: %s", settings.output_path.resolve())
 
     s3_handler = S3Handler(bucket_name=settings.s3_bucket_name)
-    time_split("S3Handler initialisation")
+    time_keeper.split("S3Handler initialisation")
 
     # Do this twice so it gets itself in the listing
     force_refresh = False
@@ -86,19 +105,21 @@ def main() -> None:
         if i > 0:
             force_refresh = True
         file_list = s3_handler.get_file_list(force_refresh=force_refresh)
-        time_split(f"S3Handler get_file_list pass {i + 1}")
+        time_keeper.split(f"S3Handler get_file_list pass {i + 1}")
 
         render_file_list(file_list, settings.base_url, settings.output_path)
-        time_split(f"render_file_list pass {i + 1}")
+        time_keeper.split(f"render_file_list pass {i + 1}")
 
         render_markdown_files(settings.markdown_path, settings.output_path)
-        time_split(f"render_markdown_files pass {i + 1}")
+        time_keeper.split(f"render_markdown_files pass {i + 1}")
 
         copy_static_files(settings.output_path)
-        time_split(f"copy_static_files pass {i + 1}")
+        time_keeper.split(f"copy_static_files pass {i + 1}")
 
         s3_handler.upload_directory(settings.output_path)
-        time_split(f"S3Handler upload_directory pass {i + 1}")
+        time_keeper.split(f"S3Handler upload_directory pass {i + 1}")
+
+    logger.info(time_keeper.summary())
 
 
 dotenv.load_dotenv()
