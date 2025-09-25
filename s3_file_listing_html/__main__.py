@@ -2,6 +2,7 @@
 
 import contextlib
 import os
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -10,9 +11,9 @@ import dotenv
 
 from .constants import EXPECTED_ENV_VARS, OPTIONAL_ENV_VARS
 from .file_list import render_file_list
-from .markdown import render_markdown_files
 from .helpers import copy_static_files
 from .logger import logger
+from .markdown import render_markdown_files
 from .s3 import S3Handler
 
 if TYPE_CHECKING:
@@ -21,6 +22,8 @@ if TYPE_CHECKING:
 else:
     S3Client = object
     ObjectTypeDef = dict
+
+start_time = time.time()
 
 
 @dataclass
@@ -55,8 +58,15 @@ def _check_env_vars() -> None:
         raise OSError(msg)
 
 
+def time_split(name: str) -> None:
+    global start_time
+    logger.warning("%s took %.2f seconds", name, time.time() - start_time)
+    start_time = time.time()
+
+
 def main() -> None:
     """Console script for s3_file_listing_html."""
+
     with contextlib.suppress(KeyError):
         log_level = os.environ["LOG_LEVEL"].upper()
         logger.setLevel(log_level)
@@ -68,6 +78,7 @@ def main() -> None:
     logger.info("Output Path: %s", settings.output_path.resolve())
 
     s3_handler = S3Handler(bucket_name=settings.s3_bucket_name)
+    time_split("S3Handler initialisation")
 
     # Do this twice so it gets itself in the listing
     force_refresh = False
@@ -75,10 +86,19 @@ def main() -> None:
         if i > 0:
             force_refresh = True
         file_list = s3_handler.get_file_list(force_refresh=force_refresh)
+        time_split(f"S3Handler get_file_list pass {i + 1}")
+
         render_file_list(file_list, settings.base_url, settings.output_path)
+        time_split(f"render_file_list pass {i + 1}")
+
         render_markdown_files(settings.markdown_path, settings.output_path)
+        time_split(f"render_markdown_files pass {i + 1}")
+
         copy_static_files(settings.output_path)
+        time_split(f"copy_static_files pass {i + 1}")
+
         s3_handler.upload_directory(settings.output_path)
+        time_split(f"S3Handler upload_directory pass {i + 1}")
 
 
 dotenv.load_dotenv()
