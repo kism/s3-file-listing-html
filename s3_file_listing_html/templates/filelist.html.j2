@@ -42,7 +42,7 @@
         <ul id="file_list" class="file-list">{% for file in file_list %}
             <li><a href="{{ base_url }}/{{ file }}">/{{ file }}</a></li>{% endfor %}
         </ul>
-        <p class="last-generated">Last generated: {{ last_generated_date }}</p>
+        <p>Last generated: {{ last_generated_date }}</p>
     </main>
     <script type="text/javascript" src="/static/js/file_list.js"></script>
     <script type="text/javascript"
