@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/static/css/file_list.css">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         .file-list {
             display: none;
         }
@@ -31,22 +36,32 @@
 </head>
 
 <body>
-    <main>
-        <h2>File Listing</h2>
-        <noscript>
-            <div id="breadcrumb_non_js" class="breadcrumb"><a>Javascript is disabled, listing
-                    everything.</a></div>
-        </noscript>
-        <div id="breadcrumb_js" class="breadcrumb"></div>
-        <ul id="file_list_js" class="file-list"></ul>
-        <ul id="file_list" class="file-list">{% for file in file_list %}
-            <li><a href="{{ base_url }}/{{ file }}">/{{ file }}</a></li>{% endfor %}
-        </ul>
-        <p>Last generated: {{ last_generated_date }}</p>
-    </main>
+    <table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td valign="top">
+                <main>
+                    <h1>File Listing</h1>
+                    <noscript>
+                        <div id="breadcrumb_non_js" class="breadcrumb"><a>Javascript is disabled, listing
+                                everything.</a></div>
+                    </noscript>
+                    <div id="breadcrumb_js" class="breadcrumb"></div>
+                    <ul id="file_list_js" class="file-list"></ul>
+                    <ul id="file_list" class="file-list">{% for file in file_list %}
+                        <li><a href="{{ base_url }}/{{ file }}">/{{ file }}</a></li>{% endfor %}
+                    </ul>
+                </main>
+            </td>
+        </tr>
+        <tr height="1">
+            <td valign="bottom">
+                <p>Last generated: {{ last_generated_date }}</p>
+            </td>
+        </tr>
+    </table>
     <script type="text/javascript" src="/static/js/file_list.js"></script>
-    <script type="text/javascript"
-        src="http://autist.network/files/funny-computer/firebug-lite-debug.js#startOpened=true,debug=false,overrideConsole=true"></script>
+    {# <script type="text/javascript"
+        src="http://autist.network/files/funny-computer/firebug-lite-debug.js#startOpened=true,debug=false,overrideConsole=true"></script> #}
 </body>
 
 </html>
