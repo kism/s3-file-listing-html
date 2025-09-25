@@ -68,6 +68,18 @@ th {
     color: #c8c8c8;
 }
 
+ul {
+  list-style-type: none;
+  padding: 0px;
+  margin: 0px;
+}
+
+li {
+  padding: 0px;
+  margin: 0px;
+}
+
+
 h1,
 h2 {
   font-family: "Fira Code", Consolas, "Lucida Console", monospace;
