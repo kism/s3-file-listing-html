@@ -3,8 +3,9 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .constants import TEMPLATE_ENV
 import bs4
+
+from .constants import TEMPLATE_ENV
 
 
 def render_file_list(file_list: list[str], base_url: str, output_path: Path) -> None:
