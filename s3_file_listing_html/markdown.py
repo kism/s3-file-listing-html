@@ -35,11 +35,10 @@ def render_markdown_files(markdown_path: Path, output_path: Path) -> None:
 
         title = TITLE_CLEANUP.sub("", title).strip()
 
-        html = markdown.markdown(text, extensions=[TableExtension()])
+        html = markdown.markdown(text, extensions=[TableExtension(), "pymdownx.superfences"])
 
         template = TEMPLATE_ENV.get_template("md.html.j2")
         rendered = template.render(content=html, title=title)
-
         rendered = bs4.BeautifulSoup(rendered, "html.parser").prettify()
 
         output_file = output_path / (md_file.stem + ".html")
